@@ -13,15 +13,9 @@ const Outcome = enum(u32) {
 };
 fn defineShapeFromDesiredOutcome(outcome: Outcome, shape: Shape) Shape {
     return switch(@enumToInt(outcome) * 10 + @enumToInt(shape)) {
-        1 => .scissors,
-        2 => .rock,
-        3 => .paper,
-        31=> .rock,
-        32=> .paper,
-        33=> .scissors,
-        61=> .paper,
-        62=> .scissors,
-        63=> .rock,
+        2, 31, 63 => .rock,
+        3, 32, 61 => .paper,
+        1, 33, 62 => .scissors,
         else=>unreachable,
     }; 
 }
