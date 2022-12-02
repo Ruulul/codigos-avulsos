@@ -16,7 +16,7 @@ fn defineShapeFromDesiredOutcome(outcome: Outcome, shape: Shape) Shape {
         2, 31, 63 => .rock,
         3, 32, 61 => .paper,
         1, 33, 62 => .scissors,
-        else=>unreachable,
+        else => unreachable,
     }; 
 }
 fn result(a: Shape, b: Shape) Outcome {
