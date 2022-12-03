@@ -24,12 +24,12 @@ pub fn main() void {
         const c_slice = common.slice();
         var c_idx: usize = 0;
 
-        main_for: for (line1) |c1| {
+        for (line1) |c1| {
             for (line2) |c2| {
                 if (c1 == c2) {
                     c_slice[c_idx] = c1;
                     c_idx += 1;
-                    continue :main_for;
+                    break;
                 }
             }
         }
