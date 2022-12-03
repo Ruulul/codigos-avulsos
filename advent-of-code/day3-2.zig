@@ -20,10 +20,7 @@ pub fn main() void {
             const max_expected_len = 50;
             const len = std.mem.max(usize, &.{line1.len, line2.len, line3.len});
 
-        var common = std.BoundedArray(?u8, max_expected_len).init(len) catch |err| {
-            std.log.debug("Error on creation of bounded array with len {}: {s}", .{line1.len, @errorName(err)});
-            return;
-        };
+        var common = std.BoundedArray(?u8, max_expected_len).init(len) catch unreachable;
         const c_slice = common.slice();
         var c_idx: usize = 0;
 
