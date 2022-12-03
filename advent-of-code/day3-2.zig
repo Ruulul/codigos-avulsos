@@ -17,8 +17,8 @@ pub fn main() void {
         const line2 = lines.next().?;
         const line3 = lines.next().?;
 
-            const max_expected_len = 50;
-            const len = std.mem.max(usize, &.{line1.len, line2.len, line3.len});
+        const max_expected_len = 50;
+        const len = std.mem.max(usize, &.{line1.len, line2.len, line3.len});
 
         var common = std.BoundedArray(?u8, max_expected_len).init(len) catch unreachable;
         const c_slice = common.slice();
