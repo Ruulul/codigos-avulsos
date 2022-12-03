@@ -13,7 +13,7 @@ const Outcome = enum(u32) {
 };
 
 fn result(a: Shape, b: Shape) Outcome {
-    return switch(@enumToInt(a) * 10 + @enumToInt(b)) {
+    return switch (@enumToInt(a) * 10 + @enumToInt(b)) {
         11, 22, 33 => .draw,
         13, 21, 32 => .victory,
         31, 12, 23 => .lost,

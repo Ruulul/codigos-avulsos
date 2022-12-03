@@ -3,10 +3,10 @@ const input = @embedFile("./day1.txt");
 
 pub fn main() void {
     var input_lines = std.mem.split(u8, input, "\n");
-    
+
     const n = 3;
-    var maxs: [n]u32 = .{0}**n;
-    
+    var maxs: [n]u32 = .{0} ** n;
+
     var acc: u32 = 0;
     while (input_lines.next()) |line| {
         if (line.len == 0) {
@@ -24,6 +24,6 @@ pub fn main() void {
 
     var total: u32 = 0;
     for (maxs) |max| total += max;
-    
+
     std.debug.print("{}", .{total});
 }

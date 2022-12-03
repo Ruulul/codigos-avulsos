@@ -12,15 +12,15 @@ const Outcome = enum(u32) {
     victory = 6,
 };
 fn defineShapeFromDesiredOutcome(outcome: Outcome, shape: Shape) Shape {
-    return switch(@enumToInt(outcome) * 10 + @enumToInt(shape)) {
+    return switch (@enumToInt(outcome) * 10 + @enumToInt(shape)) {
         2, 31, 63 => .rock,
         3, 32, 61 => .paper,
         1, 33, 62 => .scissors,
         else => unreachable,
-    }; 
+    };
 }
 fn result(a: Shape, b: Shape) Outcome {
-    return switch(@enumToInt(a) * 10 + @enumToInt(b)) {
+    return switch (@enumToInt(a) * 10 + @enumToInt(b)) {
         11, 22, 33 => .draw,
         13, 21, 32 => .victory,
         31, 12, 23 => .lost,
