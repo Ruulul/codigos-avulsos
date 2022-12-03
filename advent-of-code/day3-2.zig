@@ -24,25 +24,23 @@ pub fn main() void {
         const c_slice = common.slice();
         var c_idx: usize = 0;
 
-        for (line1) |c1| {
-            for (line2) |c2| {
+        for (line1) |c1| 
+            for (line2) |c2| 
                 if (c1 == c2) {
                     c_slice[c_idx] = c1;
                     c_idx += 1;
                     break;
-                }
-            }
-        }
+                };
+        
 
         c_idx = 0;
-        while (c_slice[c_idx]) |c| : (c_idx += 1) {
-            for (line3) |char| {
+        while (c_slice[c_idx]) |c| : (c_idx += 1) 
+            for (line3) |char| 
                 if (c == char) {
                     acc += getPriority(char);
                     continue :main_loop;
-                }
-            }
-        } else unreachable; 
+                };
+        unreachable; 
     }
 
     std.debug.print("{}", .{acc});
