@@ -17,9 +17,8 @@ pub fn main() void {
         const line2 = lines.next().?;
         const line3 = lines.next().?;
 
-        const max_expected_len = 50;
-        const len = if (line1.len > line2.len and line1.len > line3.len) line1.len
-            else if (line2.len > line3.len) line2.len else line3.len;
+            const max_expected_len = 50;
+            const len = std.mem.max(usize, &.{line1.len, line2.len, line3.len});
 
         var common = std.BoundedArray(?u8, max_expected_len).init(len) catch |err| {
             std.log.debug("Error on creation of bounded array with len {}: {s}", .{line1.len, @errorName(err)});
