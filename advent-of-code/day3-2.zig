@@ -30,16 +30,16 @@ pub fn main() void {
                     c_slice[c_idx] = c1;
                     c_idx += 1;
                     break;
-                };
-        
-
+                }
+        ;
         c_idx = 0;
         while (c_slice[c_idx]) |c| : (c_idx += 1) 
             for (line3) |char| 
                 if (c == char) {
                     acc += getPriority(char);
                     continue :main_loop;
-                };
+                }
+        ;
         unreachable; 
     }
 
