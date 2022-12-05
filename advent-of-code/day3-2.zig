@@ -22,6 +22,7 @@ pub fn main() void {
 
         var common = std.BoundedArray(?u8, max_expected_len).init(len) catch unreachable;
         const c_slice = common.slice();
+        for (c_slice) |*item| item.* = null;
         var c_idx: usize = 0;
 
         for (line1) |c1|
