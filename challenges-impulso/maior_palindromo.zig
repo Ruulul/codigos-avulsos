@@ -18,7 +18,7 @@ fn findBiggestPalindrome(string: []const u8) []const u8 {
         var end: usize = start;
         while (end < string.len) : (end += 1) {
             const len = end - start;
-            if (isPalindrome(string[start..end]) and len > size_biggest_palindrome) {
+            if (isPalindrome(string[start..end]) and len > size) {
                 size = len;
                 index = start;
             }
