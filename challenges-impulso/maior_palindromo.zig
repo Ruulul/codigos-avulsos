@@ -11,20 +11,21 @@ fn isPalindrome(string: []const u8) bool {
 }
 
 fn findBiggestPalindrome(string: []const u8) []const u8 {
-    var index_biggest_palindrome: usize = 0;
-    var size_biggest_palindrome: usize = 0;
+    var index: usize = 0;
+    var size: usize = 0;
 
     for (string) |_, start| {
         var end: usize = start;
         while (end < string.len) : (end += 1) {
-            if (isPalindrome(string[start..end]) and end - start > size_biggest_palindrome) {
-                size_biggest_palindrome = end - start;
-                index_biggest_palindrome = start;
+            const len = end - start;
+            if (isPalindrome(string[start..end]) and len > size_biggest_palindrome) {
+                size = len;
+                index = start;
             }
         }
     }
 
-    return string[index_biggest_palindrome..][0..size_biggest_palindrome];
+    return string[index..][0..size];
 }
 
 pub fn main() !void {
