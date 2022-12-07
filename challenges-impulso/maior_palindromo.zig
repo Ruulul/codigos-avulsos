@@ -66,7 +66,7 @@ fn runNTimes(n: usize, timer: *std.time.Timer, func: anytype, args: anytype) u64
 
 pub fn main() !void {
     var timer = try std.time.Timer.start();
-    const n = 1000;
+    const n = 1_000_000;
 
     for (inputs) |input| {
         std.log.debug("input: {s}", .{input});
