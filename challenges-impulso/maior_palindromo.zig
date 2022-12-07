@@ -1,5 +1,5 @@
 const std = @import("std");
-const inputs = [_][]const u8{"alareviverarara","ghiabcdefhelloadamhelloabcdefghi"};
+const inputs = [_][]const u8{ "alareviverarara", "ghiabcdefhelloadamhelloabcdefghi" };
 
 fn isPalindrome(string: []const u8) bool {
     const end = string.len / 2;
@@ -61,7 +61,7 @@ fn runNTimes(n: usize, timer: *std.time.Timer, func: anytype, args: anytype) u64
         acc += timer.lap();
     }
 
-    return @truncate(u64, acc/n);
+    return @truncate(u64, acc / n);
 }
 
 pub fn main() !void {
@@ -69,20 +69,19 @@ pub fn main() !void {
     const n = 1000;
 
     for (inputs) |input| {
-    std.log.debug("input: {s}", .{input});
-    std.log.debug("testing brute force:", .{});
-    std.log.debug("average execution time ({} iterations): {}ms. result: {s}", .{
-        n, 
-        runNTimes(n, &timer, bruteForce, .{input}), 
-        bruteForce(input),
-        }
-    );
-    
-    std.log.debug("testing dynamic approach:", .{});    std.log.debug("average execution time ({} iterations): {}ms. result: {s}", .{
-        n, 
-        runNTimes(n, &timer, dynamicApproach, .{input}), 
-        dynamicApproach(input),
-        }
-    );
+        std.log.debug("input: {s}", .{input});
+        std.log.debug("testing brute force:", .{});
+        std.log.debug("average execution time ({} iterations): {}ms. result: {s}", .{
+            n,
+            runNTimes(n, &timer, bruteForce, .{input}),
+            bruteForce(input),
+        });
+
+        std.log.debug("testing dynamic approach:", .{});
+        std.log.debug("average execution time ({} iterations): {}ms. result: {s}", .{
+            n,
+            runNTimes(n, &timer, dynamicApproach, .{input}),
+            dynamicApproach(input),
+        });
     }
 }

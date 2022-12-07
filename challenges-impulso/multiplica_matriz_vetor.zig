@@ -43,7 +43,7 @@ fn Vetor(comptime T: type) type {
         fn mul(self: *Self, vetor: Self) T {
             std.debug.assert(self.len == vetor.len);
             var acc: T = 0;
-            for (self.items) |item, i| acc += item*vetor.items[i];
+            for (self.items) |item, i| acc += item * vetor.items[i];
             return acc;
         }
     };
@@ -82,7 +82,7 @@ fn Matrix(comptime T: type) type {
         }
         fn mul(self: Self, matrix: Self) !Self {
             std.debug.assert(self.n_cols == matrix.n_rows);
-            
+
             var result = try Self.init(self.allocator, self.n_rows, matrix.n_cols);
 
             var row: usize = 0;
@@ -118,7 +118,7 @@ pub fn main() !void {
     defer matrix2.deinit();
 
     matrix1.set(0, 0, 1);
-    matrix1.set(1, 0, 2);   
+    matrix1.set(1, 0, 2);
     matrix1.set(2, 0, 3);
     matrix1.set(0, 1, 4);
     matrix1.set(1, 1, 5);

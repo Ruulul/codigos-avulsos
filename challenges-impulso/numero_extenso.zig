@@ -13,7 +13,7 @@ const toString = struct {
             7 => "sete ",
             8 => "oito ",
             9 => "nove ",
-            else => std.debug.panic("Número {} recebido em unidades", .{ n }),
+            else => std.debug.panic("Número {} recebido em unidades", .{n}),
         };
     }
 
@@ -30,7 +30,7 @@ const toString = struct {
             18 => "dezoito ",
             19 => "dezenove ",
             20 => "vinte ",
-            else => std.debug.panic("Número {} recebido em dez-vinte", .{ n }),
+            else => std.debug.panic("Número {} recebido em dez-vinte", .{n}),
         };
     }
 
@@ -46,7 +46,7 @@ const toString = struct {
             7 => "setenta ",
             8 => "oitenta ",
             9 => "noventa ",
-            else => std.debug.panic("Número {} recebido em dezenas", .{ n }),
+            else => std.debug.panic("Número {} recebido em dezenas", .{n}),
         };
     }
 
@@ -62,11 +62,11 @@ const toString = struct {
             7 => "setecentos ",
             8 => "oitocentos ",
             9 => "novecentos ",
-            else => std.debug.panic("Número {} recebido em centenas", .{ n }),
+            else => std.debug.panic("Número {} recebido em centenas", .{n}),
         };
     }
 };
-const Grandeza = enum (usize) {
+const Grandeza = enum(usize) {
     centena = 0,
     milhar = 1,
     milhao = 2,
@@ -89,20 +89,18 @@ fn numeroPorExtenso(number: anytype, writer: anytype) !void {
     comptime {
         const Writer = @TypeOf(writer);
         const n_info = @typeInfo(@TypeOf(number));
-        if (!(
-            @hasDecl(Writer, "write") and
+        if (!(@hasDecl(Writer, "write") and
             @hasDecl(Writer, "writeAll") and
-            @hasDecl(Writer, "print")
-        )) @compileError("A funcao numeroPorExtenso requer um objeto Writer");
+            @hasDecl(Writer, "print"))) @compileError("A funcao numeroPorExtenso requer um objeto Writer");
         if (n_info != .ComptimeInt and n_info != .Int) @compileError("A funcao numeroPorExtenso so funciona para numeros inteiros sem sinal");
     }
 
     var n: usize = number;
     while (n > 0) : (n %= getFatorMil(n)) {
         const grandeza = getOrdemGrandeza(n) orelse return error.InputTooBig;
-        const centena  = (n / (100 * getFatorMil(n))) % 10;
-        const dezena   = (n / (10 * getFatorMil(n))) % 10;
-        const unidade  = (n / (1 * getFatorMil(n))) % 10;
+        const centena = (n / (100 * getFatorMil(n))) % 10;
+        const dezena = (n / (10 * getFatorMil(n))) % 10;
+        const unidade = (n / (1 * getFatorMil(n))) % 10;
         if (centena == 1 and (dezena > 0 or unidade > 0))
             try writer.writeAll("cento e ")
         else
@@ -116,12 +114,9 @@ fn numeroPorExtenso(number: anytype, writer: anytype) !void {
             try writer.writeAll(toString.unidade(unidade));
         }
         switch (grandeza) {
-                .centena => {},
-                .milhar => try writer.writeAll("mil "),
-                inline else => |case| try writer.writeAll(
-                    if (n / getFatorMil(n) == 1) @tagName(case)
-                    else @tagName(case)[0..@tagName(case).len - 2] ++ "oes "
-                ),
+            .centena => {},
+            .milhar => try writer.writeAll("mil "),
+            inline else => |case| try writer.writeAll(if (n / getFatorMil(n) == 1) @tagName(case) else @tagName(case)[0 .. @tagName(case).len - 2] ++ "oes "),
         }
     }
     try writer.writeByte('\n');
