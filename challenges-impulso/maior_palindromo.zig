@@ -51,17 +51,26 @@ fn dynamicApproach(string: []const u8) []const u8 {
     return string[index..][0..size];
 }
 
-fn runNTimes(n: usize, timer: *std.time.Timer, func: anytype, args: anytype) u64 {
-    var acc: u65 = 0;
-    var i: usize = 0;
+fn manacherAlgo(string: []const u8) []const u8 {
+    const max_expected_len = 50;
+    const positions = string.len * 2 + 1;
 
-    timer.reset();
+    var length_per_position = try std.BoundedArray(u8, max_expected_len).init(positions);
+    _ = length_per_position;
+    return string;
+}
+
+fn runNTimes(comptime n: comptime_int, timer: *std.time.Timer, func: anytype, args: anytype) u64 {
+    var acc: u64 = 0;
+    var i: std.math.IntFittingRange(0, n) = 0;
+
     while (i < n) : (i += 1) {
+        timer.reset();
         _ = @call(.{}, func, args);
-        acc += timer.lap();
+        acc += timer.read();
     }
 
-    return @truncate(u64, acc / n);
+    return acc / n;
 }
 
 pub fn main() !void {
