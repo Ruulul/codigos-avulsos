@@ -39,8 +39,8 @@ const Folder = struct {
         };
         return size;
     }
-    fn findSmallestGreaterThan(root: *const Folder, at_least: usize) ?*const Folder {
-        var smallest: ?*const Folder = null;
+    fn findSmallestGreaterThan(root: Folder, at_least: usize) ?Folder {
+        var smallest: ?Folder = null;
         const size_of_self = root.getSizeFolder();
         const cond = size_of_self >= at_least;
 
