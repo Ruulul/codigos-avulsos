@@ -15,9 +15,6 @@ const Folder = struct {
             if (item.* == .folder) item.folder.deinitRecursive();
         root.contents.deinit();
     }
-    fn findRoot(self: *Folder) *Folder {
-        return if (self.parent) |parent| parent.findRoot() else self;
-    }
     fn addSizeFolderRecursiveAtMost(root: Folder, at_most: usize, general_sum: *usize) usize {
         var size: usize = 0;
         for (root.contents.items) |item| switch (item) {
@@ -56,22 +53,6 @@ const Folder = struct {
         }
 
         return smallest;
-    }
-    fn printPwd(root: Folder, writer: anytype) !void {
-        if (root.parent) |parent| try parent.printPwd(writer);
-        try writer.print("{s}/", .{root.name});
-    }
-    fn printTree(root: Folder, writer: anytype) !void {
-        try printPwd(root, writer);try writer.writeByte('\n');
-        for (root.contents.items) |item| {
-            switch (item) {
-                .file => |f| {
-                    try printPwd(root, writer);
-                    try writer.print("{s}\n", .{f.name});
-                },
-                .folder => |*f| try printTree(f, writer),
-            }
-        } 
     }
 };
 
