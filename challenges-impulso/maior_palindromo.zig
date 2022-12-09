@@ -60,16 +60,16 @@ fn manacherAlgo(string: []const u8) []const u8 {
 
     std.debug.assert(positions <= max_expected_len);
     var length_per_position = std.BoundedArray(u8, max_expected_len).init(positions) catch unreachable;
-    const p = &length_per_position;
-    for (length_per_position.slice()) |*c| c.* = 0;
+    const p = length_per_position.slice();
+    for (p) |*c| c.* = 0;
     const getIndex = struct { inline fn f(n: usize) usize { return n / 2; } }.f;
     var max_len: usize = 0;
     var start: usize = 0;
     var max_right: usize = 0;
     var center: usize = 0;
 
-    for (p.slice()) |*l, i| {
-        if (i < max_right) l.* = std.math.min(max_right - i, p.slice()[2 * center - i]);
+    for (p) |*l, i| {
+        if (i < max_right) l.* = std.math.min(max_right - i, p[2 * center - i]);
         while (i > l.* and l.* < positions - 1 - i and string[getIndex(i + l.* - 1)] == string[getIndex(i - l.*)]) l.* += 1;
         if (i + l.* > max_right) {
             center = i;
@@ -111,7 +111,7 @@ fn runNTimes(comptime n: comptime_int, timer: *std.time.Timer, func: anytype, ar
 
 pub fn main() !void {
     var timer = try std.time.Timer.start();
-    const n = 10_000_000;
+    const n = 10_000;
 
     for (inputs) |input| {
         std.log.debug("input: {s}", .{input});
