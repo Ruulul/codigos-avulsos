@@ -55,7 +55,7 @@ fn dynamicApproach(string: []const u8) []const u8 {
     return string[index..][0..size];
 }
 fn manacherAlgo(string: []const u8) []const u8 {
-    const max_expected_len = 500 * 2 + 1;
+    const max_expected_len = 200 * 2 + 1;
     const positions = string.len * 2 + 1;
 
     std.debug.assert(positions <= max_expected_len);
@@ -111,26 +111,26 @@ fn runNTimes(comptime n: comptime_int, timer: *std.time.Timer, func: anytype, ar
 
 pub fn main() !void {
     var timer = try std.time.Timer.start();
-    const n = 1000;
+    const n = 10_000_000;
 
     for (inputs) |input| {
         std.log.debug("input: {s}", .{input});
         std.log.debug("testing brute force:", .{});
-        std.log.debug("average execution time ({} iterations): {}ms. result: {s}", .{
+        std.log.debug("average execution time ({} iterations): {}. result: {s}", .{
             n,
             runNTimes(n, &timer, bruteForce, .{input}),
             bruteForce(input),
         });
 
         std.log.debug("testing dynamic approach:", .{});
-        std.log.debug("average execution time ({} iterations): {}ms. result: {s}", .{
+        std.log.debug("average execution time ({} iterations): {}. result: {s}", .{
             n,
             runNTimes(n, &timer, dynamicApproach, .{input}),
             dynamicApproach(input),
         });
 
         std.log.debug("testing manachers:", .{});
-        std.log.debug("average execution time ({} iterations): {}ms. result: {s}", .{
+        std.log.debug("average execution time ({} iterations): {}. result: {s}", .{
             n,
             runNTimes(n, &timer, manacherAlgo, .{input}),
             manacherAlgo(input),
