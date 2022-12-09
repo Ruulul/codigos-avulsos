@@ -83,6 +83,31 @@ fn manacherAlgo(string: []const u8) []const u8 {
     return string[start..][0..max_len - 1];
 }
 
+fn manacherAlloc(allocator: std.mem.Allocator, string: []const u8) []const u8 {
+    const positions = string.len * 2 + 1;
+    var p = allocator.alloc(u8, positions) catch |err| std.debug.panic("Allocation error! {s}", .{@errorName(err)});
+    defer allocator.free(p);
+    for (p) |*c| c.* = 0;
+    const getIndex = struct { inline fn f(n: usize) usize { return n / 2; } }.f;
+    var max_len: usize = 0;
+    var start: usize = 0;
+    var max_right: usize = 0;
+    var center: usize = 0;
+
+    for (p) |_, i| {
+        if (i < max_right) p[i] = std.math.min(max_right - i, p[2 * center - i]);
+        while (i > p[i] and p[i] < positions - 1 - i and string[getIndex(i + p[i] - 1)] == string[getIndex(i - p[i])]) p[i] += 1;
+        if (i + p[i] > max_right) {
+            center = i;
+            max_right = i + p[i];
+        }
+        if (p[i] > max_len) {
+            start = if (p[i] + 1 > i) 0 else (i - p[i])/2 + 1;
+            max_len = p[i];
+        }
+    }
+    return string[start..][0..max_len - 1];
+}
 const Measure = enum(u64) {
     _,
     pub fn format (value: Measure, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
@@ -113,6 +138,10 @@ pub fn main() !void {
     var timer = try std.time.Timer.start();
     const n = 10_000;
 
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
     for (inputs) |input| {
         std.log.debug("input: {s}", .{input});
         std.log.debug("testing brute force:", .{});
@@ -134,6 +163,13 @@ pub fn main() !void {
             n,
             runNTimes(n, &timer, manacherAlgo, .{input}),
             manacherAlgo(input),
+        });
+        
+        std.log.debug("testing manachers(dynamic memory):", .{});
+        std.log.debug("average execution time ({} iterations): {}. result: {s}", .{
+            n,
+            runNTimes(n, &timer, manacherAlloc, .{allocator, input}),
+            manacherAlloc(allocator, input),
         });
     }
 }
