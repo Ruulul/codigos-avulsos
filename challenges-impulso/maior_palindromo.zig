@@ -8,6 +8,7 @@ const inputs = [_][]const u8{
 fn isPalindrome(string: []const u8) bool {
     const end = string.len / 2;
     var i: usize = 0;
+    @setRuntimeSafety(false);
     return while (i < end) : (i += 1) {
         if (string[i] != string[string.len - i - 1]) break false;
     } else true;
@@ -18,6 +19,7 @@ fn bruteForce(string: []const u8) []const u8 {
     var size: usize = 0;
 
     for (string) |_, start| {
+        @setRuntimeSafety(false);
         for (string[start..]) |_, len| {
             if (len <= size) continue;
             if (isPalindrome(string[start..][0..len]) and len > size) {
@@ -35,6 +37,7 @@ fn dynamicApproach(string: []const u8) []const u8 {
     var size: usize = 0;
 
     for (string) |char, i| {
+        @setRuntimeSafety(false);
         var low = if (i == 0) 0 else i - 1;
         var high = if (i == string.len - 1) i else i + 1;
 
@@ -69,6 +72,7 @@ fn manacherAlgo(string: []const u8) []const u8 {
     var center: usize = 0;
 
     for (p) |*l, i| {
+        @setRuntimeSafety(false);
         if (i < max_right) l.* = std.math.min(max_right - i, p[2 * center - i]);
         while (i > l.* and l.* < positions - 1 - i and string[getIndex(i + l.* - 1)] == string[getIndex(i - l.*)]) l.* += 1;
         if (i + l.* > max_right) {
@@ -95,6 +99,7 @@ fn manacherAlloc(allocator: std.mem.Allocator, string: []const u8) []const u8 {
     var center: usize = 0;
 
     for (p) |_, i| {
+        @setRuntimeSafety(false);
         if (i < max_right) p[i] = std.math.min(max_right - i, p[2 * center - i]);
         while (i > p[i] and p[i] < positions - 1 - i and string[getIndex(i + p[i] - 1)] == string[getIndex(i - p[i])]) p[i] += 1;
         if (i + p[i] > max_right) {
