@@ -1,5 +1,9 @@
 const std = @import("std");
-const inputs = [_][]const u8{ "alareviverarara", "ghiabcdefhelloadamhelloabcdefghi" };
+const inputs = [_][]const u8{ 
+    "alareviverarara", 
+    "ghiabcdefhelloadamhelloabcdefghi",
+    "123476497456821389372891381947384372846372843289436289432849362489236438294863294628394368294832946832948294239468329483293432981234567898765432164378246738146783164371864378126437814637186413782",
+};
 
 fn isPalindrome(string: []const u8) bool {
     const end = string.len / 2;
@@ -50,17 +54,49 @@ fn dynamicApproach(string: []const u8) []const u8 {
 
     return string[index..][0..size];
 }
-
 fn manacherAlgo(string: []const u8) []const u8 {
-    const max_expected_len = 50;
+    const max_expected_len = 500 * 2 + 1;
     const positions = string.len * 2 + 1;
 
-    var length_per_position = try std.BoundedArray(u8, max_expected_len).init(positions);
-    _ = length_per_position;
-    return string;
+    std.debug.assert(positions <= max_expected_len);
+    var length_per_position = std.BoundedArray(u8, max_expected_len).init(positions) catch unreachable;
+    const p = &length_per_position;
+    for (length_per_position.slice()) |*c| c.* = 0;
+    const getIndex = struct { inline fn f(n: usize) usize { return n / 2; } }.f;
+    var max_len: usize = 0;
+    var start: usize = 0;
+    var max_right: usize = 0;
+    var center: usize = 0;
+
+    for (p.slice()) |*l, i| {
+        if (i < max_right) l.* = std.math.min(max_right - i, p.slice()[2 * center - i]);
+        while (i > l.* and l.* < positions - 1 - i and string[getIndex(i + l.* - 1)] == string[getIndex(i - l.*)]) l.* += 1;
+        if (i + l.* > max_right) {
+            center = i;
+            max_right = i + l.*;
+        }
+        if (l.* > max_len) {
+            start = if (l.* + 1 > i) 0 else (i - l.*)/2 + 1;
+            max_len = l.*;
+        }
+    }
+    return string[start..][0..max_len - 1];
 }
 
-fn runNTimes(comptime n: comptime_int, timer: *std.time.Timer, func: anytype, args: anytype) u64 {
+const Measure = enum(u64) {
+    _,
+    pub fn format (value: Measure, comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
+        _ = fmt;
+        var buffer: [50]u8 = undefined;
+        const digits = std.fmt.bufPrintIntToSlice(&buffer, @enumToInt(value), 10, .lower, options);
+        const index_decimal_point = digits.len -| 3;
+        for (digits[0..index_decimal_point]) |digit| try writer.writeByte(digit);
+        try writer.writeByte('.');
+        for (digits[index_decimal_point..]) |digit| try writer.writeByte(digit);
+        try writer.writeAll("ms");
+    }
+};
+fn runNTimes(comptime n: comptime_int, timer: *std.time.Timer, func: anytype, args: anytype) Measure {
     var acc: u64 = 0;
     var i: std.math.IntFittingRange(0, n) = 0;
 
@@ -70,12 +106,12 @@ fn runNTimes(comptime n: comptime_int, timer: *std.time.Timer, func: anytype, ar
         acc += timer.read();
     }
 
-    return acc / n;
+    return @intToEnum(Measure, acc / n);
 }
 
 pub fn main() !void {
     var timer = try std.time.Timer.start();
-    const n = 1_000_000;
+    const n = 1000;
 
     for (inputs) |input| {
         std.log.debug("input: {s}", .{input});
@@ -91,6 +127,13 @@ pub fn main() !void {
             n,
             runNTimes(n, &timer, dynamicApproach, .{input}),
             dynamicApproach(input),
+        });
+
+        std.log.debug("testing manachers:", .{});
+        std.log.debug("average execution time ({} iterations): {}ms. result: {s}", .{
+            n,
+            runNTimes(n, &timer, manacherAlgo, .{input}),
+            manacherAlgo(input),
         });
     }
 }
