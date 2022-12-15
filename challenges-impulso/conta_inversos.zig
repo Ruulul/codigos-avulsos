@@ -18,10 +18,10 @@ test "getInverse" {
 fn isInverseEqual(comptime T: type, n: T) bool {
     return n == getInverse(T, n);
 }
-fn countWithInverses(comptime T: type, n: []const T) usize {
+pub fn countWithInverses(comptime T: type, n: []const T) usize {
     var len = n.len;
     for (n) |i| {
-        if (isInverseEqual(T, i)) len += 1;
+        if (!isInverseEqual(T, i) and std.mem.indexOfScalar(T, n, getInverse(T, i)) == null) len += 1;
     }
     return len;
 }
