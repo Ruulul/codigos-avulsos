@@ -68,7 +68,7 @@ pub fn main() !void {
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
-    var root = Folder{.name = "/", .contents = Content.init(allocator)};
+    var root = Folder{ .name = "/", .contents = Content.init(allocator) };
 
     var current_folder: *Folder = &root;
     defer root.deinitRecursive();

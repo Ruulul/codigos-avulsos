@@ -7,7 +7,7 @@ fn contains(comptime T: type, slice: []const T, item: T) bool {
 
 pub fn main() void {
     const len = 14;
-    var last_char: [len]u8 = .{0}**len;
+    var last_char: [len]u8 = .{0} ** len;
     var counter: usize = 0;
     const i = for (input) |char, i| {
         last_char[counter] = char;
@@ -30,5 +30,5 @@ pub fn main() void {
         if (counter == len) counter = 0;
     } else null;
 
-    std.debug.print("...{s}: {any}", .{&last_char, i});
+    std.debug.print("...{s}: {any}", .{ &last_char, i });
 }

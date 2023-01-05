@@ -23,14 +23,13 @@ pub fn main() !void {
     var cols: [number_of_cols]std.ArrayList(u8) = undefined;
 
     for (cols) |*col| col.* = std.ArrayList(u8).init(allocator);
-    defer
-    for (cols) |*col| col.deinit();
+    defer for (cols) |*col| col.deinit();
 
     var lines = std.mem.tokenize(u8, input, "\n");
-    for (&[_]void{{}}**row_of_index) |_| {
+    for (&[_]void{{}} ** row_of_index) |_| {
         const line = lines.next().?;
         for (cols) |*col, i| {
-            const start = i*4;
+            const start = i * 4;
             const end = if (start + 4 > line.len) line.len else start + 4;
             const slice = line[start..end];
             var token = std.mem.tokenize(u8, slice, "[] ");
@@ -43,7 +42,7 @@ pub fn main() !void {
     lines = std.mem.tokenize(u8, input, "move from to \n");
     lines.index = new_index;
 
-    for (&[_]void{{}}**number_of_cols) |_| _ = lines.next();
+    for (&[_]void{{}} ** number_of_cols) |_| _ = lines.next();
 
     while (lines.next()) |token| {
         const move = try std.fmt.parseInt(usize, token, 0);
@@ -51,7 +50,7 @@ pub fn main() !void {
         const to = try std.fmt.parseInt(usize, lines.next().?, 0);
 
         const s = cols[from - 1].items;
-        const to_append = s[s.len - move..];
+        const to_append = s[s.len - move ..];
         std.debug.assert(to_append.len == move);
         try cols[to - 1].appendSlice(to_append);
 
