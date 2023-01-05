@@ -18,7 +18,7 @@ fn Output(comptime T: type) type {
     return std.BoundedArray(union(enum){number: T, operator: Operator}, 50);
 }
 pub fn calculate(comptime T: type, stream: []const u8) !T {
-    std.debug.print("\nStream being parsed: {s}\n", .{stream});
+    //std.debug.print("\nStream being parsed: {s}\n", .{stream});
     var tokens = std.mem.tokenize(u8, stream, " ");
     var output = Output(T).init(0) catch unreachable;
     var stack = std.BoundedArray(Operator, 50).init(0) catch unreachable;
@@ -48,15 +48,15 @@ test {
     try e(try calculate(u8, "10 - 2 * 3") == 4);
 }
 fn eval(comptime T: type, tree: Output(T)) !T {
-    std.debug.print("\nEvaluating tree\n", .{});
-    var buffer: [20]u8 = undefined;
-    for (tree.slice()) |item, i| 
-        std.debug.print("{}: {s}\n", .{i, 
-            switch(item){
-                .number=>|n|std.fmt.bufPrint(&buffer, "{}", .{n}) catch unreachable,
-                .operator=>|op|&[_]u8{op.symbol},
-            }
-        });
+    //std.debug.print("\nEvaluating tree\n", .{});
+    //var buffer: [20]u8 = undefined;
+    //for (tree.slice()) |item, i| 
+    //    std.debug.print("{}: {s}\n", .{i, 
+    //        switch(item){
+    //            .number=>|n|std.fmt.bufPrint(&buffer, "{}", .{n}) catch unreachable,
+    //            .operator=>|op|&[_]u8{op.symbol},
+    //        }
+    //    });
     var stack = Output(T).init(0) catch unreachable;
     for (tree.slice()) |op_or_number| {
         switch (op_or_number) {
@@ -84,6 +84,6 @@ fn eval(comptime T: type, tree: Output(T)) !T {
         }
     }
     std.debug.assert(stack.len == 1);
-    std.debug.print("\nResult: {}\n\n", .{stack.buffer[0].number});
+    //std.debug.print("\nResult: {}\n\n", .{stack.buffer[0].number});
     return stack.pop().number;
 } 
