@@ -68,7 +68,7 @@ pub fn calculate(comptime T: type, stream: []const u8) !T {
     var stack = std.BoundedArray(*const Operator(T), 50).init(0) catch unreachable;
     while (tokens.next()) |token| {
         const parse = std.fmt.parseInt(T, token, 0) catch {
-            std.debug.assert(token.len == 1);
+            if (token.len > 1) return error.SyntaxError;
             const last_operator = stack.buffer[stack.len -| 1];
             if (token[0] == ')') {
                 while (stack.buffer[stack.len - 1].symbol != '(') {
@@ -77,7 +77,7 @@ pub fn calculate(comptime T: type, stream: []const u8) !T {
                 _ = stack.pop();
                 continue;
             }
-            const operator = operators[std.mem.indexOfScalar(u8, operators_symbols, token[0]).?];
+            const operator = operators[std.mem.indexOfScalar(u8, operators_symbols, token[0]) orelse return error.SyntaxError];
             if (stack.len == 0 or last_operator.symbol == '(' or operator.precedence > last_operator.precedence)
                 try stack.append(operator)
             else {
@@ -102,6 +102,8 @@ test {
     try e(try calculate(u8, "1 ^ 2 ^ 3") == 1);
     try e(try calculate(u8, "3 * ( 9 - 2 )") == 21);
     try e(calculate(u8, "2 + ( 5 * 3") == error.UnmatchedParenthesis);
+    try e(calculate(u8, "2+5") == error.SyntaxError);
+    try e(calculate(u8, "2.5 + 3") == error.SyntaxError);
 }
 fn eval(comptime T: type, tree: Output(T)) !T {
     var stack = Output(T).init(0) catch unreachable;
