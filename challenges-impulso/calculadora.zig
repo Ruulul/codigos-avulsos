@@ -48,15 +48,15 @@ fn Output(comptime T: type) type {
     }, 50);
 }
 pub fn calculate(comptime T: type, stream: []const u8) !T {
-    const plus = Operator(T){ .symbol = '+', .precedence = 0, .associativity = .left, .eval = Operator(T).plusFn };
-    const minus = Operator(T){ .symbol = '-', .precedence = 0, .associativity = .left, .eval = Operator(T).minusFn };
+    const plus = &Operator(T){ .symbol = '+', .precedence = 0, .associativity = .left, .eval = Operator(T).plusFn };
+    const minus = &Operator(T){ .symbol = '-', .precedence = 0, .associativity = .left, .eval = Operator(T).minusFn };
 
-    const times = Operator(T){ .symbol = '*', .precedence = 1, .associativity = .left, .eval = Operator(T).timesFn };
-    const by = Operator(T){ .symbol = '/', .precedence = 1, .associativity = .left, .eval = Operator(T).byFn };
+    const times = &Operator(T){ .symbol = '*', .precedence = 1, .associativity = .left, .eval = Operator(T).timesFn };
+    const by = &Operator(T){ .symbol = '/', .precedence = 1, .associativity = .left, .eval = Operator(T).byFn };
 
-    const raised = Operator(T){ .symbol = '^', .precedence = 2, .associativity = .right, .eval = Operator(T).raisedFn };
-    const left_parenthesis = Operator(T){ .symbol = '(', .precedence = 5, .associativity = .left };
-    const operators: []const Operator(T) = &.{ plus, minus, times, by, raised, left_parenthesis };
+    const raised = &Operator(T){ .symbol = '^', .precedence = 2, .associativity = .right, .eval = Operator(T).raisedFn };
+    const left_parenthesis = &Operator(T){ .symbol = '(', .precedence = 5, .associativity = .left };
+    const operators: []const *const Operator(T) = &.{ plus, minus, times, by, raised, left_parenthesis };
     const operators_symbols: []const u8 = comptime blk: {
         comptime var buffer: []const u8 = "";
         for (operators) |op| buffer = buffer ++ &[_]u8{op.symbol};
@@ -77,20 +77,21 @@ pub fn calculate(comptime T: type, stream: []const u8) !T {
                 _ = stack.pop();
                 continue;
             }
-            const operator = &operators[std.mem.indexOfScalar(u8, operators_symbols, token[0]).?];
-            if (stack.len == 0) try stack.append(operator) else {
-                if (last_operator.symbol == '(' or operator.precedence > last_operator.precedence)
-                    try stack.append(operator)
-                else {
-                    try output.append(.{ .operator = stack.pop() });
-                    try stack.append(operator);
-                }
+            const operator = operators[std.mem.indexOfScalar(u8, operators_symbols, token[0]).?];
+            if (stack.len == 0 or last_operator.symbol == '(' or operator.precedence > last_operator.precedence)
+                try stack.append(operator)
+            else {
+                try output.append(.{ .operator = stack.pop() });
+                try stack.append(operator);
             }
             continue;
         };
         try output.append(.{ .number = parse });
     }
-    while (stack.popOrNull()) |op| try output.append(.{ .operator = op });
+    while (stack.popOrNull()) |op| {
+        if (op == left_parenthesis) return error.UnmatchedParenthesis;
+        try output.append(.{ .operator = op });
+    }
     return eval(T, output);
 }
 test {
@@ -100,6 +101,7 @@ test {
     try e(try calculate(u8, "2 + 3 ^ 2") == 11);
     try e(try calculate(u8, "1 ^ 2 ^ 3") == 1);
     try e(try calculate(u8, "3 * ( 9 - 2 )") == 21);
+    try e(calculate(u8, "2 + ( 5 * 3") == error.UnmatchedParenthesis);
 }
 fn eval(comptime T: type, tree: Output(T)) !T {
     var stack = Output(T).init(0) catch unreachable;
