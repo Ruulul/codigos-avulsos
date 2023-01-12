@@ -34,21 +34,18 @@ fn Operator(comptime T: type) type {
     };
 }
 fn Output(comptime T: type) type {
-    return std.BoundedArray(
-        union(enum) {
-            number: T,
-            operator: *const Operator(T),
-            pub fn format(value: Output(T), comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
-                _ = fmt;
-                _ = options;
-                try switch (value) {
-                    .number => |n| writer.print("{}", .{n}),
-                    .operator => |op| writer.print("{c}", .{op.symbol}),
-                };
-            }
-        },
-        50,
-    );
+    return std.BoundedArray(union(enum) {
+        number: T,
+        operator: *const Operator(T),
+        pub fn format(value: Output(T), comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
+            _ = fmt;
+            _ = options;
+            try switch (value) {
+                .number => |n| writer.print("{}", .{n}),
+                .operator => |op| writer.print("{c}", .{op.symbol}),
+            };
+        }
+    }, 50);
 }
 pub fn calculate(comptime T: type, stream: []const u8) !T {
     const plus = Operator(T){ .symbol = '+', .precedence = 0, .associativity = .left, .eval = Operator(T).plusFn };
@@ -60,7 +57,11 @@ pub fn calculate(comptime T: type, stream: []const u8) !T {
     const raised = Operator(T){ .symbol = '^', .precedence = 2, .associativity = .right, .eval = Operator(T).raisedFn };
     const left_parenthesis = Operator(T){ .symbol = '(', .precedence = 5, .associativity = .left };
     const operators: []const Operator(T) = &.{ plus, minus, times, by, raised, left_parenthesis };
-    const operators_symbols: []const u8 = "+-*/^(";
+    const operators_symbols: []const u8 = comptime blk: {
+        comptime var buffer: []const u8 = "";
+        for (operators) |op| buffer = buffer ++ &[_]u8{op.symbol};
+        break :blk buffer;
+    };
 
     var tokens = std.mem.tokenize(u8, stream, " ");
     var output = Output(T).init(0) catch unreachable;
