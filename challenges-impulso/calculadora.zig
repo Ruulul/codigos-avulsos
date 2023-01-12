@@ -1,25 +1,44 @@
 const std = @import("std");
-const Operator = struct {
-    symbol: u8,
-    precedence: usize,
-    associativity: enum { left, right },
-};
-const plus = Operator{ .symbol = '+', .precedence = 0, .associativity = .left };
-const minus = Operator{ .symbol = '-', .precedence = 0, .associativity = .left };
+fn Operator(comptime T: type) type {
+    return struct {
+        symbol: u8,
+        precedence: usize,
+        associativity: enum { left, right },
+        eval: ?*const fn (*Output(T)) anyerror!void = null,
 
-const times = Operator{ .symbol = '*', .precedence = 1, .associativity = .left };
-const by = Operator{ .symbol = '/', .precedence = 1, .associativity = .left };
-
-const raised = Operator{ .symbol = '^', .precedence = 2, .associativity = .right };
-const left_parenthesis = Operator{ .symbol = '(', .precedence = 5, .associativity = .left };
-const operators: []const Operator = &.{ plus, minus, times, by, raised, left_parenthesis };
-const operators_symbols: []const u8 = "+-*/^(";
+        fn plusFn(stack: *Output(T)) anyerror!void {
+            const first = stack.pop().number;
+            const last = stack.pop().number;
+            try stack.append(.{ .number = first + last });
+        }
+        fn minusFn(stack: *Output(T)) anyerror!void {
+            const first = stack.pop().number;
+            const last = stack.pop().number;
+            try stack.append(.{ .number = last - first });
+        }
+        fn timesFn(stack: *Output(T)) anyerror!void {
+            const first = stack.pop().number;
+            const last = stack.pop().number;
+            try stack.append(.{ .number = last * first });
+        }
+        fn byFn(stack: *Output(T)) anyerror!void {
+            const first = stack.pop().number;
+            const last = stack.pop().number;
+            try stack.append(.{ .number = last / first });
+        }
+        fn raisedFn(stack: *Output(T)) anyerror!void {
+            const first = stack.pop().number;
+            const last = stack.pop().number;
+            try stack.append(.{ .number = std.math.pow(@TypeOf(last), last, first) });
+        }
+    };
+}
 fn Output(comptime T: type) type {
     return std.BoundedArray(
         union(enum) {
             number: T,
-            operator: Operator,
-            pub fn format(value: @This(), comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
+            operator: *const Operator(T),
+            pub fn format(value: Output(T), comptime fmt: []const u8, options: std.fmt.FormatOptions, writer: anytype) !void {
                 _ = fmt;
                 _ = options;
                 try switch (value) {
@@ -32,9 +51,20 @@ fn Output(comptime T: type) type {
     );
 }
 pub fn calculate(comptime T: type, stream: []const u8) !T {
+    const plus = Operator(T){ .symbol = '+', .precedence = 0, .associativity = .left, .eval = Operator(T).plusFn };
+    const minus = Operator(T){ .symbol = '-', .precedence = 0, .associativity = .left, .eval = Operator(T).minusFn };
+
+    const times = Operator(T){ .symbol = '*', .precedence = 1, .associativity = .left, .eval = Operator(T).timesFn };
+    const by = Operator(T){ .symbol = '/', .precedence = 1, .associativity = .left, .eval = Operator(T).byFn };
+
+    const raised = Operator(T){ .symbol = '^', .precedence = 2, .associativity = .right, .eval = Operator(T).raisedFn };
+    const left_parenthesis = Operator(T){ .symbol = '(', .precedence = 5, .associativity = .left };
+    const operators: []const Operator(T) = &.{ plus, minus, times, by, raised, left_parenthesis };
+    const operators_symbols: []const u8 = "+-*/^(";
+
     var tokens = std.mem.tokenize(u8, stream, " ");
     var output = Output(T).init(0) catch unreachable;
-    var stack = std.BoundedArray(Operator, 50).init(0) catch unreachable;
+    var stack = std.BoundedArray(*const Operator(T), 50).init(0) catch unreachable;
     while (tokens.next()) |token| {
         const parse = std.fmt.parseInt(T, token, 0) catch {
             std.debug.assert(token.len == 1);
@@ -46,7 +76,7 @@ pub fn calculate(comptime T: type, stream: []const u8) !T {
                 _ = stack.pop();
                 continue;
             }
-            const operator = operators[std.mem.indexOfScalar(u8, operators_symbols, token[0]).?];
+            const operator = &operators[std.mem.indexOfScalar(u8, operators_symbols, token[0]).?];
             if (stack.len == 0) try stack.append(operator) else {
                 if (last_operator.symbol == '(' or operator.precedence > last_operator.precedence)
                     try stack.append(operator)
@@ -73,29 +103,10 @@ test {
 fn eval(comptime T: type, tree: Output(T)) !T {
     var stack = Output(T).init(0) catch unreachable;
     for (tree.slice()) |op_or_number| {
-        switch (op_or_number) {
-            .number => try stack.append(op_or_number),
-            .operator => |op| switch (op.symbol) {
-                '+' => try stack.append(.{ .number = stack.pop().number + stack.pop().number }),
-                '-' => {
-                    const last = stack.pop().number;
-                    const first = stack.pop().number;
-                    try stack.append(.{ .number = first - last });
-                },
-                '*' => try stack.append(.{ .number = stack.pop().number * stack.pop().number }),
-                '/' => {
-                    const last = stack.pop().number;
-                    const first = stack.pop().number;
-                    try stack.append(.{ .number = first / last });
-                },
-                '^' => {
-                    const last = stack.pop().number;
-                    const first = stack.pop().number;
-                    try stack.append(.{ .number = std.math.pow(T, first, last) });
-                },
-                else => unreachable,
-            },
-        }
+        try switch (op_or_number) {
+            .number => stack.append(op_or_number),
+            .operator => |op| op.eval.?(&stack),
+        };
     }
     std.debug.assert(stack.len == 1);
     return stack.pop().number;
