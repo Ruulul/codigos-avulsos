@@ -19,7 +19,7 @@
                 position: 'absolute', right: 0, top: '50%', width: '1.5em', height: '1.5em',
                 transform: 'translateY(-50%)'
             })
-            close.onclick = _ => slide_and_fade(div, { direction: 'bottom', easing: 'ease-out', duration: 800 })
+            close.onclick = FLIP(div, _ => slide_and_fade(div, { direction: 'top', by: 100, duration: 800 }), { duration: 800 })
             div.append(close)
 
             return div
@@ -29,39 +29,42 @@
          * @param {HTMLElement} element
          * @param {any} options
          */
-        function slide_and_fade(original, { direction = 'top', by = 400, duration = 200, easing = 'ease-in-out' }) {
+        function slide_and_fade(original, { direction = 'top', by = 400, duration = 200 }) {
             const clone = original.cloneNode(true)
-
-            //First: register
-            const original_transform = original.style.transform
-            const original_opacity = original.style.opacity
-            const original_pos = original.getBoundingClientRect()
-            const original_key = original_pos[direction]
-
-            //Last: alter the document
-            let new_key = original_key + by
-            if (['top', 'left'].includes(direction)) new_key *= -1
-            clone.style[direction] = new_key
-
-            //Invert: calculate the transformation
-
-            //Play: animate the invertion, so it looks like coming from First
-            clone.animate([{
-                    transform: original_transform || 'none',
-                    opacity: original_opacity || 1,
-                },
-                {
-                    transformOrigin: 'top left',
-                    transform: `translate${['left', 'right'].includes(direction) ? 'X' : 'Y'}(${by}px)`,
-                    opacity: 0,
-                }
-            ], {
-                duration: duration,
-                easing: easing,
-                fill: 'both',
-            })
+            const rect = original.getBoundingClientRect()
+            clone.style.position = 'absolute'
+            const d = ['top', 'bottom'].includes(direction) ? 'top' : 'left'
+            const increment = by * (['top', 'left'].includes(direction) ? -1 : 1)
+            clone.style[d] = rect[d] + increment + 'px'
+            clone.style.opacity = 0
             original.replaceWith(clone)
-            setTimeout(_ => clone.remove(), duration || 200)
+            setTimeout(_ => clone.remove(), duration)
+            return clone
+        }
+
+        function FLIP(el, fn, options = {}) {
+            const { duration = 200, easing = 'ease-in-out', fill = 'both', iterations = 1, iterationStart = 0 } = options
+            return function () {
+                const first = el.getBoundingClientRect()
+                const f_opacity = el.style.opacity || 1
+                const last_el = fn() || el
+                const last = last_el.getBoundingClientRect()
+                const l_opacity = last_el.style.opacity || 1
+
+                const i = {
+                    top: first.top - last.top,
+                    left: first.left - last.left,
+                    width: first.width / last.width,
+                    height: first.height / last.height
+                }
+
+                last_el.animate([
+                    { transformOrigin: 'top left', opacity: f_opacity, transform: ` translate(${i.left}px, ${i.top}px)` },
+                    { transformOrigin: 'top left', opacity: l_opacity, transform: 'none' }
+                ], {
+                    duration, easing, fill, iterations, iterationStart
+                })
+            }
         }
     </script>
 </body>
