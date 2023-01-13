@@ -29,30 +29,35 @@
          * @param {HTMLElement} element
          * @param {any} options
          */
-        function slide_and_fade(original, { direction, by, duration, easing } = {}) {
+        function slide_and_fade(original, { direction = 'top', by = 400, duration = 200, easing = 'ease-in-out' }) {
             const clone = original.cloneNode(true)
 
+            //First: register
             const original_transform = original.style.transform
             const original_opacity = original.style.opacity
             const original_pos = original.getBoundingClientRect()
+            const original_key = original_pos[direction]
 
-            const original_key = original_pos[direction || 'top']
-            let new_key = original_key + (by || 400)
+            //Last: alter the document
+            let new_key = original_key + by
             if (['top', 'left'].includes(direction)) new_key *= -1
             clone.style[direction] = new_key
 
+            //Invert: calculate the transformation
+
+            //Play: animate the invertion, so it looks like coming from First
             clone.animate([{
                     transform: original_transform || 'none',
                     opacity: original_opacity || 1,
                 },
                 {
                     transformOrigin: 'top left',
-                    transform: `translate${['left', 'right'].includes(direction) ? 'X' : 'Y'}(${new_key}px)`,
+                    transform: `translate${['left', 'right'].includes(direction) ? 'X' : 'Y'}(${by}px)`,
                     opacity: 0,
                 }
             ], {
-                duration: duration || 200,
-                easing: easing || 'ease-in-out',
+                duration: duration,
+                easing: easing,
                 fill: 'both',
             })
             original.replaceWith(clone)
