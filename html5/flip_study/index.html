@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-zoom=1.0">
+
 <body>
     <button name="Add">Add div</button>
     <script>
@@ -18,10 +19,44 @@
                 position: 'absolute', right: 0, top: '50%', width: '1.5em', height: '1.5em',
                 transform: 'translateY(-50%)'
             })
-            close.onclick = _ => div.remove()
+            close.onclick = _ => slide_and_fade(div, { direction: 'bottom', easing: 'ease-out', duration: 800 })
             div.append(close)
 
             return div
+        }
+
+        /**
+         * @param {HTMLElement} element
+         * @param {any} options
+         */
+        function slide_and_fade(original, { direction, by, duration, easing } = {}) {
+            const clone = original.cloneNode(true)
+
+            const original_transform = original.style.transform
+            const original_opacity = original.style.opacity
+            const original_pos = original.getBoundingClientRect()
+
+            const original_key = original_pos[direction || 'top']
+            let new_key = original_key + (by || 400)
+            if (['top', 'left'].includes(direction)) new_key *= -1
+            clone.style[direction] = new_key
+
+            clone.animate([{
+                    transform: original_transform || 'none',
+                    opacity: original_opacity || 1,
+                },
+                {
+                    transformOrigin: 'top left',
+                    transform: `translate${['left', 'right'].includes(direction) ? 'X' : 'Y'}(${new_key}px)`,
+                    opacity: 0,
+                }
+            ], {
+                duration: duration || 200,
+                easing: easing || 'ease-in-out',
+                fill: 'both',
+            })
+            original.replaceWith(clone)
+            setTimeout(_ => clone.remove(), duration || 200)
         }
     </script>
 </body>
