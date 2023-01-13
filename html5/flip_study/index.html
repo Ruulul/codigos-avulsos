@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-zoom=1.0">
+
+<body>
+    <button name="Add">Add div</button>
+    <script>
+        const add_div = document.querySelector("button[name=Add]")
+        add_div.onclick = _ => document.body.append(create_div())
+
+        function create_div() {
+            const div = document.createElement("div")
+            Object.assign(div.style, {
+                position: 'relative', border: 'solid', width: '5em', height: '2em'
+            })
+            const close = document.createElement("button")
+            close.textContent = 'X'
+            Object.assign(close.style, {
+                position: 'absolute', right: 0, width: '1.5em', height: '1.5em'
+            })
+            close.onclick = _ => div.remove()
+            div.append(close)
+
+            return div
+        }
+    </script>
+</body>
