@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-zoom=1.0">
-
 <body>
     <button name="Add">Add div</button>
     <script>
@@ -16,7 +15,8 @@
             const close = document.createElement("button")
             close.textContent = 'X'
             Object.assign(close.style, {
-                position: 'absolute', right: 0, width: '1.5em', height: '1.5em'
+                position: 'absolute', right: 0, top: '50%', width: '1.5em', height: '1.5em',
+                transform: 'translateY(-50%)'
             })
             close.onclick = _ => div.remove()
             div.append(close)
