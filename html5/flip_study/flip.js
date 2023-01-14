@@ -9,7 +9,7 @@ class FLIP {
         children.forEach(el => this.first.set(el, FLIP.snap(el)))
     }
     flip(options) {
-        this.first.forEach((first, last) => FLIP.flip({ first, last }, undefined, options))
+        this.first.forEach((first, last) => FLIP.flip({ first, last }, options))
     }
     wrap(fn) {
         return _ => {
