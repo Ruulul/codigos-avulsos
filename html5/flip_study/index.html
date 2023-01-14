@@ -9,8 +9,20 @@
         add_div.onclick = _ => document.body.append(create_div())
 
         function create_div(options = {}) {
-            const { duration = 800, by = 100, direction = 'bottom' } = options
+            const { duration = 400, by = 100, direction = 'right' } = options
             const div = document.createElement("div")
+            div.animate([{
+                originTransform: 'top left',
+                transform: `translateX(-5em)`,
+                opacity: 0,
+            }, {
+                transform: 'none',
+                opacity: 1,
+            }], {
+                fill: 'both',
+                duration: duration,
+                easing: 'ease-in',
+            })
             Object.assign(div.style, {
                 position: 'relative', border: 'solid', width: '5em', height: '2em'
             })
@@ -24,12 +36,12 @@
                 const parent = div.parentNode
                 const children = [...parent.children]
                 const before = new Map();
-                children.map(el => before.set(el, { 
+                children.map(el => before.set(el, {
                     getBoundingClientRect: (_ => {
                         const rect = el.getBoundingClientRect()
                         return _ => rect
-                    })(), 
-                    style: Object.assign({}, el.style) 
+                    })(),
+                    style: Object.assign({}, el.style)
                 }))
                 FLIP(div, _ => slide_and_fade(div, { direction, by, duration }), { duration })
                 for (const [last, first] of before) {
@@ -73,7 +85,6 @@
                 width: first.width / last.width,
                 height: first.height / last.height
             }
-            console.log(i)
 
             last_el.animate([
                 { transformOrigin: 'top left', opacity: f_opacity, transform: ` translate(${i.left}px, ${i.top}px)` },
