@@ -3,13 +3,6 @@ class FLIP {
         this.root = root ?? document.body
         this.first = new Map()
     }
-    static snap(el) {
-        const rect = el.getBoundingClientRect()
-        return {
-            getBoundingClientRect: _ => rect,
-            style: el.style,
-        }
-    }
     read() {
         const children = [...this.root.children]
         this.first.clear()
@@ -23,6 +16,13 @@ class FLIP {
             this.read()
             fn()
             requestAnimationFrame(_ => this.flip())
+        }
+    }
+    static snap(el) {
+        const rect = el.getBoundingClientRect()
+        return {
+            getBoundingClientRect: _ => rect,
+            style: el.style,
         }
     }
     static flip(el, options = {}) {
