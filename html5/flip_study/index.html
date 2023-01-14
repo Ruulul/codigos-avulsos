@@ -46,16 +46,21 @@
          */
         function slide_and_fade(original, { direction = 'top', by = 400, duration = 200 }) {
             const first = FLIP.snap(original)
+
             const clone = original.cloneNode(true)
             const rect = original.getBoundingClientRect()
+
             clone.style.position = 'absolute'
             const d = ['top', 'bottom'].includes(direction) ? 'top' : 'left'
             const increment = by * (['top', 'left'].includes(direction) ? -1 : 1)
             clone.style[d] = rect[d] + increment + 'px'
             clone.style.opacity = 0
+            
             original.replaceWith(clone)
+
             FLIP.flip({first, last: clone}, { duration })
             setTimeout(_ => clone.remove(), duration)
+            
             return clone
         }
     </script>
