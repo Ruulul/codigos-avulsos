@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-zoom=1.0">
+<script src="./flip.js"></script>
 
 <body>
     <button name="Add">Add div</button>
@@ -32,22 +33,8 @@
                 position: 'absolute', right: 0, top: '50%', width: '1.5em', height: '1.5em',
                 transform: 'translateY(-50%)'
             })
-            close.onclick = _ => {
-                const parent = div.parentNode
-                const children = [...parent.children]
-                const before = new Map();
-                children.map(el => before.set(el, {
-                    getBoundingClientRect: (_ => {
-                        const rect = el.getBoundingClientRect()
-                        return _ => rect
-                    })(),
-                    style: Object.assign({}, el.style)
-                }))
-                FLIP(div, _ => slide_and_fade(div, { direction, by, duration }), { duration })
-                for (const [last, first] of before) {
-                    FLIP({ first, last }, undefined, { duration })
-                }
-            }
+            const animation_options = { direction, by, duration }
+            close.onclick = _ => new FLIP(div.parentNode).wrap(_ => flip(div, _ => slide_and_fade(div, animation_options), animation_options))
             div.append(close)
 
             return div
@@ -68,30 +55,6 @@
             original.replaceWith(clone)
             setTimeout(_ => clone.remove(), duration)
             return clone
-        }
-
-        function FLIP(el, fn, options = {}) {
-            const { duration = 200, easing = 'ease-in-out', fill = 'both', iterations = 1, iterationStart = 0 } = options
-            const first_el = el?.first || el
-            const first = first_el.getBoundingClientRect()
-            const f_opacity = first_el.style.opacity || 1
-            const last_el = (fn ? fn() : undefined) || el?.last || el
-            const last = last_el.getBoundingClientRect()
-            const l_opacity = last_el.style.opacity || 1
-
-            const i = {
-                top: first.top - last.top,
-                left: first.left - last.left,
-                width: first.width / last.width,
-                height: first.height / last.height
-            }
-
-            last_el.animate([
-                { transformOrigin: 'top left', opacity: f_opacity, transform: ` translate(${i.left}px, ${i.top}px)` },
-                { transformOrigin: 'top left', opacity: l_opacity, transform: 'none' }
-            ], {
-                duration, easing, fill, iterations, iterationStart
-            })
         }
     </script>
 </body>
