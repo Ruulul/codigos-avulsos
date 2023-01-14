@@ -22,9 +22,9 @@
             })
             close.onclick = _ => {
                 const parent = div.parentNode
-                const children = parent.children
+                const children = [...parent.children]
                 const before = new Map();
-                [...children].map(el => before.set(el, { 
+                children.map(el => before.set(el, { 
                     getBoundingClientRect: (_ => {
                         const rect = el.getBoundingClientRect()
                         return _ => rect
