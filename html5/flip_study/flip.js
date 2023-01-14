@@ -1,4 +1,5 @@
 class FLIP {
+    static flip_batch = new Set()
     constructor(root = null) {
         this.root = root ?? document.body
         this.first = new Map()
@@ -26,7 +27,15 @@ class FLIP {
         }
     }
     static flip(el, options = {}) {
-        requestAnimationFrame(_ => {
+        if (FLIP.flip_batch.size === 0) requestAnimationFrame(do_batch)
+        FLIP.flip_batch.add(el)
+        
+        function do_batch () {
+            FLIP.flip_batch.forEach(el=>_flip(el, options))
+            FLIP.flip_batch.clear()
+        }
+
+        function _flip(el, options) {
             const { duration = 200, easing = 'ease-in-out', fill = 'both', iterations = 1, iterationStart = 0 } = options
             const first_el = el?.first || el
             const first = first_el.getBoundingClientRect()
@@ -48,7 +57,7 @@ class FLIP {
             ], {
                 duration, easing, fill, iterations, iterationStart
             })
-        })
+        }
     }
 }
 
