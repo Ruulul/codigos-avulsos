@@ -5,9 +5,23 @@
 
 <body>
     <button name="Add">Add div</button>
+    <button name="reverse">Reverse all</button>
     <script>
         const add_div = document.querySelector("button[name=Add]")
-        add_div.onclick = _ => document.body.append(create_div())
+        const reverse_all = document.querySelector("button[name=reverse]")
+        const div = document.createElement("div")
+        document.body.append(div)
+        add_div.onclick = _ => div.append(create_div())
+        reverse_all.onclick = _ => {
+            const children = [...div.children]
+            const flip = new FLIP(div)
+            flip.read()
+            
+            children.reverse()
+            div.replaceChildren(...children)
+
+            flip.flip({ duration: 800 })
+        }
 
         function create_div(options = {}) {
             const { duration = 400, by = 100, direction = 'right' } = options
