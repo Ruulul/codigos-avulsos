@@ -34,7 +34,7 @@
                 transform: 'translateY(-50%)'
             })
             const animation_options = { direction, by, duration }
-            close.onclick = _ => new FLIP(div.parentNode).wrap(_ => flip(div, _ => slide_and_fade(div, animation_options), animation_options))
+            close.onclick = new FLIP(div.parentNode).wrap(_ => slide_and_fade(div, animation_options), animation_options)
             div.append(close)
 
             return div
@@ -45,6 +45,7 @@
          * @param {any} options
          */
         function slide_and_fade(original, { direction = 'top', by = 400, duration = 200 }) {
+            const first = FLIP.snap(original)
             const clone = original.cloneNode(true)
             const rect = original.getBoundingClientRect()
             clone.style.position = 'absolute'
@@ -53,6 +54,7 @@
             clone.style[d] = rect[d] + increment + 'px'
             clone.style.opacity = 0
             original.replaceWith(clone)
+            FLIP.flip({first, last: clone}, { duration })
             setTimeout(_ => clone.remove(), duration)
             return clone
         }
