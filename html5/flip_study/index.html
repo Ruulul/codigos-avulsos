@@ -8,7 +8,8 @@
         const add_div = document.querySelector("button[name=Add]")
         add_div.onclick = _ => document.body.append(create_div())
 
-        function create_div() {
+        function create_div(options = {}) {
+            const { duration = 800, by = 100, direction = 'bottom' } = options
             const div = document.createElement("div")
             Object.assign(div.style, {
                 position: 'relative', border: 'solid', width: '5em', height: '2em'
@@ -19,7 +20,22 @@
                 position: 'absolute', right: 0, top: '50%', width: '1.5em', height: '1.5em',
                 transform: 'translateY(-50%)'
             })
-            close.onclick = FLIP(div, _ => slide_and_fade(div, { direction: 'top', by: 100, duration: 800 }), { duration: 800 })
+            close.onclick = _ => {
+                const parent = div.parentNode
+                const children = parent.children
+                const before = new Map();
+                [...children].map(el => before.set(el, { 
+                    getBoundingClientRect: (_ => {
+                        const rect = el.getBoundingClientRect()
+                        return _ => rect
+                    })(), 
+                    style: Object.assign({}, el.style) 
+                }))
+                FLIP(div, _ => slide_and_fade(div, { direction, by, duration }), { duration })
+                for (const [last, first] of before) {
+                    FLIP({ first, last }, undefined, { duration })
+                }
+            }
             div.append(close)
 
             return div
@@ -44,27 +60,27 @@
 
         function FLIP(el, fn, options = {}) {
             const { duration = 200, easing = 'ease-in-out', fill = 'both', iterations = 1, iterationStart = 0 } = options
-            return function () {
-                const first = el.getBoundingClientRect()
-                const f_opacity = el.style.opacity || 1
-                const last_el = fn() || el
-                const last = last_el.getBoundingClientRect()
-                const l_opacity = last_el.style.opacity || 1
+            const first_el = el?.first || el
+            const first = first_el.getBoundingClientRect()
+            const f_opacity = first_el.style.opacity || 1
+            const last_el = (fn ? fn() : undefined) || el?.last || el
+            const last = last_el.getBoundingClientRect()
+            const l_opacity = last_el.style.opacity || 1
 
-                const i = {
-                    top: first.top - last.top,
-                    left: first.left - last.left,
-                    width: first.width / last.width,
-                    height: first.height / last.height
-                }
-
-                last_el.animate([
-                    { transformOrigin: 'top left', opacity: f_opacity, transform: ` translate(${i.left}px, ${i.top}px)` },
-                    { transformOrigin: 'top left', opacity: l_opacity, transform: 'none' }
-                ], {
-                    duration, easing, fill, iterations, iterationStart
-                })
+            const i = {
+                top: first.top - last.top,
+                left: first.left - last.left,
+                width: first.width / last.width,
+                height: first.height / last.height
             }
+            console.log(i)
+
+            last_el.animate([
+                { transformOrigin: 'top left', opacity: f_opacity, transform: ` translate(${i.left}px, ${i.top}px)` },
+                { transformOrigin: 'top left', opacity: l_opacity, transform: 'none' }
+            ], {
+                duration, easing, fill, iterations, iterationStart
+            })
         }
     </script>
 </body>
