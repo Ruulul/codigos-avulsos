@@ -11,7 +11,7 @@
         const reverse_all = document.querySelector("button[name=reverse]")
         const div = document.createElement("div")
         document.body.append(div)
-        add_div.onclick = _ => div.append(create_div())
+        add_div.onclick = _ => create_div({ root: div })
         reverse_all.onclick = _ => {
             const children = [...div.children]
             const flip = new FLIP(div)
@@ -24,7 +24,7 @@
         }
 
         function create_div(options = {}) {
-            const { duration = 400, by = 100, direction = 'right' } = options
+            const { duration = 400, by = 100, direction = 'right', root = document.body } = options
             const div = document.createElement("div")
             div.animate([{
                 originTransform: 'top left',
@@ -48,9 +48,9 @@
                 transform: 'translateY(-50%)'
             })
             const animation_options = { direction, by, duration }
-            close.onclick = new FLIP(div.parentNode).wrap(_ => slide_and_fade(div, animation_options), animation_options)
+            close.onclick = new FLIP(root).wrap(_ => slide_and_fade(div, animation_options), animation_options)
             div.append(close)
-
+            root.append(div)
             return div
         }
 
