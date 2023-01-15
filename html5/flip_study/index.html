@@ -6,14 +6,20 @@
 <body>
     <button name="Add">Add div</button>
     <button name="reverse">Reverse all</button>
+    <div>
+        <input name="n"><button name="add n">Add N divs</button>
+    </div>
     <script>
         const add_div = document.querySelector("button[name=Add]")
         const reverse_all = document.querySelector("button[name=reverse]")
+        const add_n = document.querySelector("button[name='add n']")
+        const n = document.querySelector("input[name=n]")
         const div = document.createElement("div")
         document.body.append(div)
         add_div.onclick = _ => create_div({ root: div })
+        add_n.onclick = _ => {for (let i = 0; i < n.value; i++) create_div({ root: div })}
         reverse_all.onclick = _ => {
-            const children = [...div.children]
+            const children = Array.from(div.children)
             const flip = new FLIP(div)
             flip.read()
             
