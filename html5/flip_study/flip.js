@@ -5,7 +5,7 @@ class FLIP {
         this.first = new Map()
     }
     read() {
-        const children = [...this.root.children]
+        const children = this.root.childNodes
         this.first.clear()
         children.forEach(el => this.first.set(el, FLIP.snap(el)))
     }
@@ -22,8 +22,11 @@ class FLIP {
     static snap(el) {
         const rect = el.getBoundingClientRect()
         return {
-            getBoundingClientRect: _ => rect,
-            style: Object.assign({}, el.style),
+            rect,
+            style: {
+                opacity: el.style.opacity,
+                transform: el.style.transform,
+            },
         }
     }
     static flip(el, options = {}) {
@@ -37,11 +40,15 @@ class FLIP {
 
         function _flip(el, options) {
             const { duration = 200, easing = 'ease-in-out', fill = 'both', iterations = 1, iterationStart = 0 } = options
-            const first_el = el?.first || el
-            const first = first_el.getBoundingClientRect()
+            
+            const first_el = el.first
+            const first = first_el.rect
+            const f_transform = first_el.style.transform
             const f_opacity = first_el.style.opacity || 1
-            const last_el = el?.last || el
+
+            const last_el = el.last
             const last = last_el.getBoundingClientRect()
+            const l_transform = last_el.style.transform
             const l_opacity = last_el.style.opacity || 1
 
             const i = {
@@ -52,8 +59,8 @@ class FLIP {
             }
 
             last_el.animate([
-                { transformOrigin: 'top left', opacity: f_opacity, transform: ` translate(${i.left}px, ${i.top}px)` },
-                { transformOrigin: 'top left', opacity: l_opacity, transform: 'none' }
+                { transformOrigin: 'top left', opacity: f_opacity, transform: f_transform + ` translate(${i.left}px, ${i.top}px)` },
+                { transformOrigin: 'top left', opacity: l_opacity, transform: l_transform || 'none' }
             ], {
                 duration, easing, fill, iterations, iterationStart
             })
