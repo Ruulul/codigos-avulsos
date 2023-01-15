@@ -1,11 +1,11 @@
 class FLIP {
-    static flip_batch = new Set()
+    static flip_batch = new Set
     constructor(root = null) {
         this.root = root ?? document.body
-        this.first = new Map()
+        this.first = new Map
     }
     read() {
-        const children = this.root.childNodes
+        const children = [...this.root.children]
         this.first.clear()
         children.forEach(el => this.first.set(el, FLIP.snap(el)))
     }
@@ -34,8 +34,10 @@ class FLIP {
         FLIP.flip_batch.add(el)
         
         function do_batch () {
+            console.time("batch")
             FLIP.flip_batch.forEach(el=>_flip(el, options))
             FLIP.flip_batch.clear()
+            console.timeEnd("batch")
         }
 
         function _flip(el, options) {
