@@ -2,36 +2,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-zoom=1.0">
 <script src="./flip.js"></script>
-
 <body>
-    <button name="Add">Add div</button>
-    <button name="reverse">Reverse all</button>
+    <button name="mark-all">Mark all</button>
     <div>
-        <input name="n"><button name="add n">Add N divs</button>
+        <input maxlength="30" name="todo"><button name="add">Add to-do</button>
     </div>
     <script>
-        const add_div = document.querySelector("button[name=Add]")
-        const reverse_all = document.querySelector("button[name=reverse]")
-        const add_n = document.querySelector("button[name='add n']")
-        const n = document.querySelector("input[name=n]")
-        const div = document.createElement("div")
-        document.body.append(div)
-        add_div.onclick = _ => create_div({ root: div })
-        add_n.onclick = _ => {for (let i = 0; i < n.value; i++) create_div({ root: div })}
-        reverse_all.onclick = _ => {
-            const children = Array.from(div.children)
-            const flip = new FLIP(div)
-            flip.read()
-            
-            children.reverse()
-            div.replaceChildren(...children)
+        const mark_all = document.querySelector("button[name=mark-all]")
+        const add_todo = document.querySelector("button[name=add]")
 
-            flip.flip({ duration: 800 })
+        const todo_input = document.querySelector("input[name=todo]")
+        const todos_div = document.createElement("div")
+        todos_div.style.position = 'relative'
+        todos_div.style.margin = 'auto'
+        todos_div.style.width = '33vw'
+        document.body.append(todos_div)
+
+        add_todo.onclick = _ => {
+            if (!todo_input.value) return
+            todos_div.append(create_div({ text: todo_input.value }, protocol))
+            todo_input.value = ''
         }
 
-        function create_div(options = {}) {
-            const { duration = 400, by = 100, direction = 'right', root = document.body } = options
+        function protocol(notify) {
+            return listen
+        }
+        function listen(msg) {
+
+        }
+
+        function create_div(options = {}, protocol) {
+            const notify = protocol ? protocol(listen) : undefined
+            const { duration = 400, by = 100, direction = 'right', text } = options
+            const el = document.createElement("div")
+            const shadow = el.attachShadow({mode:"closed"})
             const div = document.createElement("div")
+            const text_p = document.createElement("p")
+            text_p.textContent ||= text
+            Object.assign(text_p.style, {display: 'flex', margin: 0})
+            div.append(text_p)
             div.animate([{
                 originTransform: 'top left',
                 transform: `translateX(-5em)`,
@@ -45,19 +54,32 @@
                 easing: 'ease-in',
             })
             Object.assign(div.style, {
-                position: 'relative', border: 'solid', width: '5em', height: '2em'
+                minWidth: '5em', minHeight: '2em',
+                display: 'flex',
+                justifyContent: 'center', alignItems: 'center',
             })
             const close = document.createElement("button")
             close.textContent = 'X'
             Object.assign(close.style, {
                 position: 'absolute', right: 0, top: '50%', width: '1.5em', height: '1.5em',
-                transform: 'translateY(-50%)'
+                transform: 'translateY(-50%)',
+                outline: 'none', backgroundColor: 'transparent'
             })
             const animation_options = { direction, by, duration }
-            close.onclick = new FLIP(root).wrap(_ => slide_and_fade(div, animation_options), animation_options)
+            close.onclick = function () {
+                new FLIP(el.parentNode)
+                    .wrap(_ =>
+                        slide_and_fade(div, animation_options),
+                        animation_options
+                    )()
+            }
             div.append(close)
-            root.append(div)
-            return div
+            shadow.append(div)
+            return el
+
+            function listen(msg) {
+
+            }
         }
 
         /**
@@ -75,12 +97,12 @@
             const increment = by * (['top', 'left'].includes(direction) ? -1 : 1)
             clone.style[d] = rect[d] + increment + 'px'
             clone.style.opacity = 0
-            
+
             original.replaceWith(clone)
 
-            FLIP.flip({first, last: clone}, { duration })
+            FLIP.flip({ first, last: clone }, { duration })
             setTimeout(_ => clone.remove(), duration)
-            
+
             return clone
         }
     </script>
