@@ -16,9 +16,7 @@ const force_options = {
     iterations,
     settings: {
         adjustSize: true,
-        barnesHutOptimize: false,
-        strongGravityMode: true,
-        gravity: 1,
+        gravity: 0.005,
         slowDown: 10,
     }
 }
@@ -34,11 +32,21 @@ async function fillGraph(layout, n = 50, time = 50) {
         graph.addNode(i, { label: `Node ${i}`, color: `#${r().toString(16).slice(2, 8)}`, x: r() * r_factor, y: r() * r_factor })
         const source = Math.floor(Math.sqrt(i))
         graph.addEdge(source, i)
-        graph.updateNode(source, data => ({...data, size: graph.degree(source)/5}))
+        graph.forEachNode(node => graph.setNodeAttribute(node, 'size', Math.log(countNeighborsRecursive(node))))
         FA2.assign(graph, force_options)
         await wait(time)
     }
     if (!layout.isRunning()) layout.start()
+    console.log("graph filled, end of syncronous layout")
+    function countNeighborsRecursive(node, depth = 5) {
+        return graph.reduceOutNeighbors(node, 
+            (acc, neighbor) => acc + (
+                depth 
+                    ? countNeighborsRecursive(neighbor, depth - 1) 
+                    : graph.degree(neighbor)
+                )
+            , 1)
+    }
 }
 
 async function wait(n) {
