@@ -11,22 +11,30 @@ root.append(graph_container)
 
 const graph = new Graph()
 const renderer = new Sigma(graph, graph_container)
+const iterations = 5
 const force_options = {
-    iterations: 5,
+    iterations,
     settings: {
-        slowDown: 5000,
+        adjustSize: true,
+        barnesHutOptimize: false,
+        strongGravityMode: true,
+        gravity: 1,
+        slowDown: 10,
     }
 }
 const layout = new FA2_worker(graph, force_options)
-fillGraph(layout, 1000, 5)
+fillGraph(layout, 1000, iterations)
 
 async function fillGraph(layout, n = 50, time = 50) {
+    const graph = layout.graph
     if (layout.isRunning()) layout.stop()
     for (let i = 0; i < n; i++) {
         const r_factor = 50
         const r = Math.random
-        layout.graph.addNode(i, { label: `Node ${i}`, color: `#${r().toString(16).slice(2, 8)}`, x: r() * r_factor, y: r() * r_factor })
-        layout.graph.addEdge(Math.floor(Math.sqrt(i)), i)
+        graph.addNode(i, { label: `Node ${i}`, color: `#${r().toString(16).slice(2, 8)}`, x: r() * r_factor, y: r() * r_factor })
+        const source = Math.floor(Math.sqrt(i))
+        graph.addEdge(source, i)
+        graph.updateNode(source, data => ({...data, size: graph.degree(source)/5}))
         FA2.assign(graph, force_options)
         await wait(time)
     }
