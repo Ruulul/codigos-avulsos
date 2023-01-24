@@ -18,21 +18,19 @@ const force_options = {
     }
 }
 const layout = new FA2_worker(graph, force_options)
-fillGraph(graph, 1000, 5)
-layout.start()
+fillGraph(layout, 1000, 5)
 
-async function fillGraph(graph, n = 50, time = 50) {
-    return iter(0, n, time)
-    async function iter(i, n, time) {
-        if (i >= n) return
+async function fillGraph(layout, n = 50, time = 50) {
+    if (layout.isRunning()) layout.stop()
+    for (let i = 0; i < n; i++) {
         const r_factor = 50
         const r = Math.random
-        graph.addNode(i, { label: `Node ${i}`, color: `#${r().toString(16).slice(2, 8)}`, x: r() * r_factor, y: r() * r_factor })
-        graph.addEdge(Math.floor(Math.sqrt(i)), i)
+        layout.graph.addNode(i, { label: `Node ${i}`, color: `#${r().toString(16).slice(2, 8)}`, x: r() * r_factor, y: r() * r_factor })
+        layout.graph.addEdge(Math.floor(Math.sqrt(i)), i)
         FA2.assign(graph, force_options)
         await wait(time)
-        return iter(i + 1, n, time)
     }
+    if (!layout.isRunning()) layout.start()
 }
 
 async function wait(n) {
