@@ -11,18 +11,21 @@ const char = Tracks({
             colors: ['green', 'white', 'orange', 'red'],
         }
     },
-    track_protocol: make_protocol({
-        update: msg =>
-            char_state.innerHTML = `
-                ${Object
-                .entries(msg.data)
-                .map(([key, value]) =>
-                    `<li>${key}: ${value}</li>`)
-                .join('')
-            }
-            `
-    })
-})
-
+}, make_protocol({
+    update: msg =>
+        char_state.innerHTML = `
+            ${Object
+            .entries(msg.data)
+            .map(([key, { label, state }]) =>
+                `<li>${label}: <ul>${Object
+                    .entries(state)
+                    .map(([key, value]) =>
+                        `<li>${key}: ${value}</li>`
+                    ).join('')
+                }</ul></li>`)
+            .join('')
+        }
+        `
+}))
 
 root.append(char, char_state)

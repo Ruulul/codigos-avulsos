@@ -11,10 +11,10 @@ module.exports = function Dot(opts = {}, protocol) {
     ensureColor()
 
     const name = generateId('ui-dot')
-    const listen = make_listen({ mark, increment, decrement, get: do_protocol })
+    const listen = make_listen({ mark: color(mark), increment: color(increment), decrement: color(decrement), get: do_protocol })
     const notify = protocol ? protocol(listen, name) : undefined
-    dot.onclick = event(increment)
-    dot.oncontextmenu = event(decrement)
+    dot.onclick = event(color(increment))
+    dot.oncontextmenu = event(color(decrement))
 
     dot.notify = listen
 
@@ -33,16 +33,19 @@ module.exports = function Dot(opts = {}, protocol) {
 
     function mark(msg) {
         state = msg.data.value
-        ensureColor()
     }
     function increment() {
         state = (state + 1) % colors.length
-        ensureColor()
     }
     function decrement() {
         state--
         if (state < 0) state += colors.length
-        ensureColor()
+    }
+    function color(fn) {
+        return (...args) => {
+            fn(...args)
+            ensureColor()
+        }
     }
     function ensureColor() {
         dot.style.backgroundColor = colors[state]
