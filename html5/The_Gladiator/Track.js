@@ -10,7 +10,7 @@ module.exports = function Track(opts = {}, protocol) {
     const dots_state = new Map()
     const dots = Array(count).fill().map((_, index) => Dot(opts.dot_opts, make_protocol({
         update: msg => {
-            dots_state.get(msg.head[0]).state = msg.data
+            dots_state.get(msg.head[0]).state = msg.data.state
             notify_state()
         }
     }, (notify, id) => dots_state.set(id, { notify, index }))))
@@ -32,14 +32,9 @@ module.exports = function Track(opts = {}, protocol) {
 function get_state(state) {
     const data = {}
     for (const dot of state.values()) {
-        const { label, marked } = dot.state ?? {}
-        if (label) {
-            if (!data[label]) data[label] = 0
-            data[label]++
-        } else {
-            if (!data[marked]) data[marked] = 0
-            data[marked]++
-        }
+        const state = dot.state
+        if (!data[state]) data[state] = 0
+        data[state]++
     }
     return data
 }

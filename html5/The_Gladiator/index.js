@@ -1,13 +1,14 @@
-const Character = require("./Character")
+const Tracks = require("./Tracks")
 const { make_protocol } = require("./Component")
 
 const root = document.body
 const char_state = document.createElement("ul")
-const char = Character({
-    tracks: {
+const char = Tracks({
+    tracks: [{ label: "Dominant Arm", count: 3 }, { label: "Non Dominant Arm", count: 2 }, { label: "Body", count: 4 }],
+    tracks_opts: {
         dot_opts: {
+            states: ['Vigor', 'Empty', 'Fatigue', 'Wound'],
             colors: ['green', 'white', 'orange', 'red'],
-            labels: ['Vigor', 'Empty', 'Fatigue', 'Wound'],
         }
     },
     track_protocol: make_protocol({

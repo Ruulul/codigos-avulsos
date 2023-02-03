@@ -1,20 +1,18 @@
 const { make_listen, generateId } = require("./Component")
 const LabelledTrack = require("./LabelledTrack")
 
-module.exports = function Character(opts = {}, protocol) {
+module.exports = function Tracks(opts = {}, protocol) {
     const root = document.createElement("div")
     Object.assign(root.style, {
         display: 'grid', width: 'fit-content', justifyItems: 'right',
         ...opts.root_style
     })
 
-    const dominant_arm = Track("Dominant Arm", 3)
-    const non_dominant_arm = Track("Non Dominant Arm", 2)
-    const body = Track("Body", 4)
+    const tracks = opts.tracks.map(({label, count})=>Track(label, count))
 
-    root.append(dominant_arm, non_dominant_arm, body)
+    root.append(...tracks)
 
-    const name = generateId('ui-character')
+    const name = generateId('ui-tracks')
     const listen = make_listen({})
     const notify = protocol ? protocol(listen, name) : undefined
     root.notify = listen
@@ -22,6 +20,6 @@ module.exports = function Character(opts = {}, protocol) {
     return root
 
     function Track(label, count) {
-        return LabelledTrack({ label, count, ...opts.tracks }, opts.track_protocol)
+        return LabelledTrack({ label, count, ...opts.tracks_opts }, opts.track_protocol)
     }
 }
