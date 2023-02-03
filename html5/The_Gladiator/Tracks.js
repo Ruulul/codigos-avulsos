@@ -1,7 +1,7 @@
 const { make_listen, generateId, make_protocol } = require("./Component")
 const LabelledTrack = require("./LabelledTrack")
 
-module.exports = function Tracks(opts = {}, protocol) {
+module.exports = function Tracks(_tracks, opts = {}, protocol) {
     const root = document.createElement("div")
     Object.assign(root.style, {
         display: 'grid', width: 'fit-content', justifyItems: 'right',
@@ -14,14 +14,14 @@ module.exports = function Tracks(opts = {}, protocol) {
     root.notify = listen
 
     const tracks_state = new Map()
-    const tracks = opts.tracks.map(({ label, count }) => Track(label, count))
+    const tracks = _tracks.map(({ label, count }) => Track(label, count))
 
     root.append(...tracks)
 
     return root
 
     function Track(label, count) {
-        return LabelledTrack({ label, count, ...opts.tracks_opts }, make_protocol({
+        return LabelledTrack({ label, count, ...opts.tracks }, make_protocol({
             update(msg) {
                 tracks_state.get(msg.head[0]).state = msg.data
                 notify_state()
