@@ -27,4 +27,7 @@ const char = Tracks([{ label: "Dominant Arm", count: 3 }, { label: "Non Dominant
      `
 }))
 
-root.append(char, char_state)
+root.append(char, char_state,
+    Tracks([{ label: "Tokens", count: 6 }], 
+    { tracks: { dot_opts: { states: ["Empty, Token"], colors: ["black", "white"] } } })
+)

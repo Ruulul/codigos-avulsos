@@ -30,6 +30,6 @@ module.exports = function Tracks(_tracks, opts = {}, protocol) {
     }
 
     function notify_state() {
-        notify({ head: [name], type: 'update', data: Object.fromEntries(tracks_state.entries()) })
+        if (notify) notify({ head: [name], type: 'update', data: Object.fromEntries(tracks_state.entries()) })
     }
 }

@@ -49,6 +49,6 @@ module.exports = function Dot(opts = {}, protocol) {
     }
     function ensureColor() {
         dot.style.backgroundColor = colors[state]
-        dot.title = state[state]
+        dot.title = states[state]
     }
 }

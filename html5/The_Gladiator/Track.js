@@ -25,7 +25,7 @@ module.exports = function Track(opts = {}, protocol) {
     return track
 
     function notify_state() {
-        notify({ head: [name], type: 'update', data: get_state(dots_state) })
+        if (notify) notify({ head: [name], type: 'update', data: get_state(dots_state) })
     }
 }
 
