@@ -74,7 +74,7 @@ module.exports = function Dot(opts = {}, protocol) {
     }
     function ensureColor() {
         dot.style.backgroundColor = colors[state]
-        dot.title = state[state]
+        dot.title = states[state]
     }
 }
 },{"./Component":1}],3:[function(require,module,exports){
@@ -123,7 +123,7 @@ module.exports = function Track(opts = {}, protocol) {
     return track
 
     function notify_state() {
-        notify({ head: [name], type: 'update', data: get_state(dots_state) })
+        if (notify) notify({ head: [name], type: 'update', data: get_state(dots_state) })
     }
 }
 
@@ -169,7 +169,7 @@ module.exports = function Tracks(_tracks, opts = {}, protocol) {
     }
 
     function notify_state() {
-        notify({ head: [name], type: 'update', data: Object.fromEntries(tracks_state.entries()) })
+        if (notify) notify({ head: [name], type: 'update', data: Object.fromEntries(tracks_state.entries()) })
     }
 }
 },{"./Component":1,"./LabelledTrack":3}],6:[function(require,module,exports){
@@ -202,5 +202,8 @@ const char = Tracks([{ label: "Dominant Arm", count: 3 }, { label: "Non Dominant
      `
 }))
 
-root.append(char, char_state)
+root.append(char, char_state,
+    Tracks([{ label: "Tokens", count: 6 }], 
+    { tracks: { dot_opts: { states: ["Empty, Token"], colors: ["black", "white"] } } })
+)
 },{"./Component":1,"./Tracks":5}]},{},[6]);
