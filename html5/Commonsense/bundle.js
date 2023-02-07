@@ -1,4 +1,5 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+"use strict";
 const { generateId, make_listen, make_protocol } = require('@v142857/component-helpers')
 const Outcome = require('./Outcome')
 
@@ -51,6 +52,7 @@ module.exports = function Argument(opts = {}, protocol) {
     return el
 }
 },{"./Outcome":2,"@v142857/component-helpers":4}],2:[function(require,module,exports){
+"use strict";
 const { generateId, make_listen, make_protocol } = require('@v142857/component-helpers')
 
 module.exports = function Outcome(opts = {}, protocol) {
@@ -158,6 +160,7 @@ function flowColumnReverse(el) {
     return el
 }
 },{"@v142857/component-helpers":4}],3:[function(require,module,exports){
+"use strict";
 const Argument = require("./Argument")
 
 document.body.append(Argument())

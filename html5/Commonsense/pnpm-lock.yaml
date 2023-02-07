@@ -4,6 +4,7 @@ specifiers:
   '@v142857/component-helpers': ^1.0.0
   browserify: ^17.0.0
   budo: ^11.8.4
+  strictify: ^0.2.0
 
 dependencies:
   '@v142857/component-helpers': 1.0.0
@@ -11,6 +12,7 @@ dependencies:
 devDependencies:
   browserify: 17.0.0
   budo: 11.8.4
+  strictify: 0.2.0
 
 packages:
 
@@ -1588,6 +1590,12 @@ packages:
   /strict-uri-encode/1.1.0:
     resolution: {integrity: sha512-R3f198pcvnB+5IpnBlRkphuE9n46WyVl8I39W/ZUTZLz4nqSP/oLYUrcnJrw462Ds8he4YKMov2efsTIw1BDGQ==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /strictify/0.2.0:
+    resolution: {integrity: sha512-34LtKr5QJ2J9G3payXdYmMHlyPAuR+6JxobVqPYQ/MUu4XLqWZbAk2B3Zk4XtRgdwr/6vGpVBA+HSadv4dFelQ==}
+    dependencies:
+      through: 2.3.8
     dev: true
 
   /string_decoder/0.10.31:
