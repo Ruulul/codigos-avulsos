@@ -1,0 +1,21 @@
+{
+  "name": "Commonsense",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "budo index.js:bundle.js --open --live",
+    "build": "browserify index.js -o bundle.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "budo": "^11.8.4"
+  },
+  "dependencies": {
+    "@v142857/component-helpers": "^1.0.0"
+  }
+}
